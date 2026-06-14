@@ -1,4 +1,4 @@
-"# Tehran UGI Connectivity Framework
+# Tehran UGI Connectivity Framework
 
 **A Multiscale Diagnostic Framework for Urban Green Infrastructure Connectivity Assessment**
 
