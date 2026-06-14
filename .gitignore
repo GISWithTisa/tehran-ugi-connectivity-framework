@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+
+# Shapefiles
+*.shp
+*.dbf
+*.shx
+*.prj
+*.cpg
+
+# Raster
+*.tif
+*.tiff
+
+# Results
+results/*
+conefor/*
