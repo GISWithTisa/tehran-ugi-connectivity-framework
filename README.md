@@ -271,7 +271,7 @@ All input data are included in the `data/` folder:
 
 For questions, suggestions, or collaboration inquiries:
 
-**Nahid Nematikutenaee** – nahid.nk@gmail.com
+**Nahid Nematikutenaee** – nahid.nk1982@gmail.com
 
 ---
 
@@ -290,4 +290,3 @@ We thank the Google Earth Engine team for providing the remote sensing platform,
 ## 🔄 Reproducibility Statement
 
 All analyses reported in the research can be fully reproduced using the code and data provided in this repository. The computational workflow is documented step‑by‑step above. Any deviations or assumptions are explicitly stated in the manuscript's Methods section.
-```
