@@ -24,7 +24,6 @@ The framework integrates remote sensing (Google Earth Engine), landscape metrics
 ---
 
 ## 📁 Repository Structure
-
 tehran-ugi-connectivity-framework/
 │
 ├── README.md # This file
@@ -78,7 +77,7 @@ tehran-ugi-connectivity-framework/
 ├── nodes_baseline.txt # Node file for baseline scenario
 └── connections_baseline.txt # Connection file for baseline (dummy weights)
 
-
+text
 
 ---
 
@@ -99,8 +98,9 @@ Install using:
 
 ```bash
 pip install -r requirements.txt
+requirements.txt content:
 
-requirements.txt:
+text
 numpy
 pandas
 rasterio
@@ -110,28 +110,27 @@ scipy
 shapely
 tqdm
 matplotlib
-
 🔧 Setup & Installation
 1. Clone the repository
+bash
 git clone https://github.com/GISWithTisa/tehran-ugi-connectivity-framework.git
 cd tehran-ugi-connectivity-framework
-
 2. Install Python dependencies
+bash
 pip install -r requirements.txt
-
 3. Google Earth Engine setup
 Create a GEE account at earthengine.google.com
 
 Run 01_preprocess_gee.js in the GEE Code Editor
 
-Export GI_Z.tif and IMP.tif to Google Drive
+Export GI_Z.tif and IMP.tif to your Google Drive
 
 Download and place both files in data/
 
 4. Generate resistance surface
 Run 02_resistance_layer.js in the GEE Code Editor
 
-Export Resistance.tif to Google Drive
+Export Resistance.tif to your Google Drive
 
 Place the file in data/
 
@@ -165,14 +164,14 @@ Full City	"City"	data/start_point.shp
 North	"North"	data/core_N.shp
 South	"South"	data/core_S.shp
 South (Node 30 removed)	"South_30"	data/core_S_30.shp
-
+bash
 python src/04_dijkstra_network.py
-
 Before each run, change the configuration in the script:
+
+python
 RES_PATH = "data/Resistance.tif"
 POINTS_PATH = "data/start_point.shp"   # Change for each scenario
 REGION_NAME = "City"                    # Change for each scenario
-
 Outputs:
 
 Output	Description
