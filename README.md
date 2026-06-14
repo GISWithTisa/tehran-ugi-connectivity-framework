@@ -79,3 +79,28 @@ tehran-ugi-connectivity-framework/
     ├── connection_South_30.txt     # Connection file for south (Node 30 removed)
     ├── nodes_baseline.txt          # Node file for baseline scenario
     └── connections_baseline.txt    # Connection file for baseline (dummy weights)
+
+
+Requirements
+Software
+Tool	Version	Purpose
+Python	3.11+	Core computation
+Google Earth Engine	GEE Code Editor	Remote sensing preprocessing
+Conefor	2.6	Connectivity metrics (IIC, dIIC)
+FRAGSTATS	4.2	Landscape metrics (optional)
+
+Python Libraries
+Install using:
+pip install -r requirements.txt
+
+requirements.txt:
+numpy
+pandas
+rasterio
+geopandas
+networkx
+scipy
+shapely
+tqdm
+matplotlib
+
