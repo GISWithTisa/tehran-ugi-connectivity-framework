@@ -3,8 +3,7 @@
 """
 04_dijkstra_network.py
 Least-cost path modeling, cost matrix, IIC sensitivity, graph metrics, and Conefor export
-Compatible with full city, north, or south subnetworks
-Based on original code from the research
+Compatible with full city, north, south, and south_30 subnetworks
 """
 
 import rasterio
@@ -22,12 +21,16 @@ import os
 import pickle
 
 # =====================================================
-# 1️⃣ CONFIGURATION
+# 1️⃣ CONFIGURATION - CHANGE THESE FOR EACH SCENARIO
 # =====================================================
+# For Full City:   REGION_NAME = "City",   POINTS_PATH = "data/start_point.shp"
+# For North:       REGION_NAME = "North",  POINTS_PATH = "data/core_N.shp"
+# For South:       REGION_NAME = "South",  POINTS_PATH = "data/core_S.shp"
+# For South_30:    REGION_NAME = "South_30", POINTS_PATH = "data/core_S_30.shp"
 
-RES_PATH = "/content/Resistance.tif"
-POINTS_PATH = "/content/start_point.shp"   # City: start_point.shp, North: core_N.shp, South: core_S.shp
-REGION_NAME = "City"                       # City / North / South
+RES_PATH = "data/Resistance.tif"
+POINTS_PATH = "data/start_point.shp"
+REGION_NAME = "City"
 
 # =====================================================
 # 2️⃣ LOAD DATA
@@ -48,6 +51,12 @@ points = gpd.read_file(POINTS_PATH)
 
 if points.crs != crs:
     points = points.to_crs(crs)
+
+# Ensure Area_ha column exists
+if "Area_ha" not in points.columns:
+    print("ERROR: Area_ha column not found in points file.")
+    print("Please ensure the points shapefile has an 'Area_ha' field.")
+    exit(1)
 
 n = len(points)
 rows, cols = resistance.shape
@@ -290,7 +299,7 @@ for i in range(n):
 print(f"P75 network edges: {G_final.number_of_edges()}")
 
 # =====================================================
-# 1️⃣5️⃣ GRAPH THEORY METRICS (from original code)
+# 1️⃣5️⃣ GRAPH THEORY METRICS
 # =====================================================
 
 print("\nComputing graph theory metrics...")
@@ -332,20 +341,20 @@ np.save(areas_path, areas)
 print(f"Areas saved: {areas_path}")
 
 # =====================================================
-# 1️⃣7️⃣ SAVE CONEFOR FILES (matching original format)
+# 1️⃣7️⃣ SAVE CONEFOR FILES (Scenario 2 - With Corridors)
 # =====================================================
 
 os.makedirs("conefor", exist_ok=True)
 
-# nodes file (matching original: sep=" ", no header)
+# nodes file
 nodes_output = points[["ID", "Area_ha"]]
 nodes_output.to_csv(f"conefor/nodes_{REGION_NAME}.txt",
                     sep=" ",
                     index=False,
                     header=False)
-print(f"Conefor nodes file: conefor/nodes_{REGION_NAME}.txt")
+print(f"Conefor nodes file (with corridors): conefor/nodes_{REGION_NAME}.txt")
 
-# connections file (matching original format)
+# connections file (with actual weights for Scenario 2)
 connections = []
 for i, j, data in G_final.edges(data=True):
     connections.append([i + 1, j + 1, data["weight"]])
@@ -355,17 +364,43 @@ if connections:
     np.savetxt(f"conefor/connections_{REGION_NAME}.txt",
                connections_df,
                fmt=["%d", "%d", "%.6f"])
-    print(f"Conefor connections file: conefor/connections_{REGION_NAME}.txt")
+    print(f"Conefor connections file (with corridors): conefor/connections_{REGION_NAME}.txt")
 else:
     print("Warning: No edges found for Conefor connections file.")
 
 # =====================================================
-# 1️⃣8️⃣ CALCULATE dIIC (node removal analysis)
+# 1️⃣8️⃣ CREATE CONEFOR FILES FOR SCENARIO 1 (Baseline - No Corridors)
+# =====================================================
+
+# For baseline (no corridors), we need a connections file with very large weights
+# so that no connections are considered by Conefor
+
+baseline_nodes_file = f"conefor/nodes_baseline_{REGION_NAME}.txt"
+baseline_connections_file = f"conefor/connections_baseline_{REGION_NAME}.txt"
+
+# Copy nodes file (same as above)
+nodes_output.to_csv(baseline_nodes_file, sep=" ", index=False, header=False)
+print(f"Conefor nodes file (baseline): {baseline_nodes_file}")
+
+# Create baseline connections file with large dummy weights
+baseline_connections = []
+for i in range(n):
+    for j in range(i + 1, n):
+        baseline_connections.append([i + 1, j + 1, 999999.0])
+
+if baseline_connections:
+    baseline_connections_df = np.array(baseline_connections)
+    np.savetxt(baseline_connections_file,
+               baseline_connections_df,
+               fmt=["%d", "%d", "%.6f"])
+    print(f"Conefor connections file (baseline): {baseline_connections_file}")
+
+# =====================================================
+# 1️⃣9️⃣ CALCULATE dIIC (node removal analysis)
 # =====================================================
 
 print("\nCalculating dIIC (node removal analysis)...")
 dIIC = {}
-G_temp_full = G_final.copy()
 
 for node in tqdm(G_final.nodes(), desc="dIIC calculation"):
     G_temp = G_final.copy()
@@ -379,15 +414,26 @@ dIIC_df.to_csv(dIIC_csv, index=False)
 print(f"dIIC results saved: {dIIC_csv}")
 
 # =====================================================
-# 1️⃣9️⃣ PRINT SUMMARY
+# 2️⃣0️⃣ PRINT SUMMARY
 # =====================================================
 
 print("\n" + "=" * 60)
 print("SUMMARY")
 print("=" * 60)
-print(f"IICnum: {calculate_iic(G_final, areas):.2f}")
-print(f"EC(IIC): {calculate_iic(G_final, areas) * (AL**2):.2f}")
+iic_value = calculate_iic(G_final, areas)
+print(f"IICnum: {iic_value:.2f}")
+print(f"EC(IIC): {iic_value * (AL**2):.2f}")
 print(f"Network density: {nx.density(G_final):.4f}")
 print(f"Connected components: {nx.number_connected_components(G_final)}")
 print("=" * 60)
 print("\nAll outputs successfully created.")
+print("\n" + "=" * 60)
+print("CONEFOR FILES SUMMARY")
+print("=" * 60)
+print(f"Scenario 2 (With Corridors):")
+print(f"  - Nodes: conefor/nodes_{REGION_NAME}.txt")
+print(f"  - Connections: conefor/connections_{REGION_NAME}.txt")
+print(f"Scenario 1 (Baseline - No Corridors):")
+print(f"  - Nodes: conefor/nodes_baseline_{REGION_NAME}.txt")
+print(f"  - Connections: conefor/connections_baseline_{REGION_NAME}.txt")
+print("=" * 60)

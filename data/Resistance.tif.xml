@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xml:lang="en"><Esri><CreaDate>20260213</CreaDate><CreaTime>19592400</CreaTime><ArcGISFormat>1.0</ArcGISFormat><SyncOnce>TRUE</SyncOnce><DataProperties><lineage><Process ToolSource="e:\arcgis\desktop10.8\ArcToolbox\Toolboxes\Spatial Analyst Tools.tbx\ExtractByMask" Date="20260213" Time="195924">ExtractByMask Ecological_Resistance.tif E:\TISA\Science\7-Research\research\LST_UHI\LST_UHI\LST_UHI.gdb\Tehran_limit E:\TISA\Science\7-Research\research\GI\raster\GEE\Resistance.tif</Process></lineage></DataProperties></Esri></metadata>
